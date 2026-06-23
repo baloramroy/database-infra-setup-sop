@@ -28,57 +28,84 @@ By default MySQL:
 * Allows only local connections
 * Blocks all remote access
 
-Check:
+Run this query:
 
-```bash
-ss -tulnp | grep 3306
+```sql
+SELECT user, host FROM mysql.user ORDER BY user, host;
 ```
+Expected Output:
 
-Expected output (default):
+```
++------------------+-----------+
+| user             | host      |
++------------------+-----------+
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| myuser           | localhost |
+| root             | localhost |
++------------------+-----------+
 
 ```
-127.0.0.1:3306
-```
+> Thats mean only local connection is allowed.
 
 ---
 
 ## Configure MySQL for Remote Access
 
-### Create Custom Configuration File (Recommended)
+### First Check 
 
-Do NOT modify `/etc/my.cnf` directly.
+- Run:
 
-Create:
+  ```bash
+  ss -tulnp | grep 3306
+  ```
 
-```bash
-vim /etc/my.cnf.d/mysql-server.cnf
-```
+- Output:
 
-Add:
+  ```
+  127.0.0.1:3306
+  ```
 
-```ini
-[mysqld]
-bind-address = 0.0.0.0
-```
+  > If you find **mysql port** is bind to **localhost** then follow below step otherwise skip to Configure Firewall part.
 
-### Explanation:
+### Create Custom Configuration File
 
-* `127.0.0.1` → local only
-* `0.0.0.0` → listens on all interfaces
+Do Not modify `/etc/my.cnf` directly.
+
+- Create:
+
+  ```bash
+  vim /etc/my.cnf.d/mysql-server.cnf
+  ```
+
+- Add:
+
+  ```ini
+  [mysqld]
+  bind-address = 0.0.0.0
+  ```
+
+- Explanation:
+
+  * `127.0.0.1` → local only
+  * `0.0.0.0` → listens on all interfaces
 
 #
 
 ### Restart MySQL Service
 
-```bash
-systemctl restart mysqld
-```
+- Run:
 
-Verify:
+  ```bash
+  systemctl restart mysqld
+  ```
 
-```bash
-systemctl status mysqld
-```
+- Verify:
+
+  ```bash
+  systemctl status mysqld
+  ```
 
 #
 
@@ -92,6 +119,9 @@ Expected:
 
 ```
 0.0.0.0:3306
+or
+*:3306
+
 ```
 
 ---
@@ -100,108 +130,118 @@ Expected:
 
 ### Open MySQL Port
 
-```bash
-firewall-cmd --permanent --add-port=3306/tcp
-firewall-cmd --reload
-```
+- Run
+  
+  ```bash
+  firewall-cmd --permanent --add-port=3306/tcp
+  firewall-cmd --reload
+  ```
 
-Verify:
+- Verify:
 
-```bash
-firewall-cmd --list-ports
-```
+  ```bash
+  firewall-cmd --list-ports
+  ```
 
-Expected:
+- Expected:
 
-```
-3306/tcp
-```
+  ```
+  3306/tcp
+  ```
 
----
+#
 
-### Production Best Practice (Recommended)
+### Production Best Practice
 
-Instead of opening to all networks, restrict access:
+- Instead of opening to all networks, restrict access:
 
-```bash
-firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.0/24" port port="3306" protocol="tcp" accept'
-firewall-cmd --reload
-```
+  ```bash
+  firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.0/24" port port="3306" protocol="tcp" accept'
+  firewall-cmd --reload
+  ```
 
 ---
 
 ## Create Remote MySQL User (Secure Method)
 
-Login to MySQL:
+- Login to MySQL:
 
-```bash
-mysql -u root -p
-```
+  ```bash
+  mysql -u root -p
+  ```
 
-Create Database (if needed)
+- Create Database (if needed)
 
-```sql
-CREATE DATABASE myappdb;
-```
+  ```sql
+  CREATE DATABASE myappdb;
+  ```
 
-Create Remote User (Restrict by IP Range)
+- Create Remote User (Restrict by IP Range)
 
-```sql
-CREATE USER 'myuser'@'192.168.1.%' IDENTIFIED BY 'StrongPassword@123!';
-```
+  ```sql
+  CREATE USER 'remoteuser'@'192.168.1.%' IDENTIFIED BY 'StrongPassword@123!';
+  ```
 
-Grant Least Privileges (Best Practice)
+- Grant Least Privileges (Best Practice)
 
-```sql
-GRANT SELECT, INSERT, UPDATE, DELETE ON myappdb.* TO 'myuser'@'192.168.1.%';
-```
-> Avoid full access unless required
+  ```sql
+  GRANT SELECT, INSERT, UPDATE, DELETE ON myappdb.* TO 'remoteuser'@'192.168.1.%';
+  ```
+  > Avoid full access unless required
 
-OR (only if required):
+- OR (only if required):
 
-```sql
-GRANT ALL PRIVILEGES ON myappdb.* TO 'myuser'@'192.168.1.%';
-```
+  ```sql
+  GRANT ALL PRIVILEGES ON myappdb.* TO 'remoteuser'@'192.168.1.%';
+  ```
 
----
+- Provide acces to all databases with grant access (Not recommanded):
 
-## Apply Changes
+  ```sql
+  GRANT ALL PRIVILEGES ON *.* TO 'remoteuser'@'%' WITH GRANT OPTION;
+  ```
 
-```sql
-FLUSH PRIVILEGES;
-```
+- ### Apply Changes
+
+  ```sql
+  FLUSH PRIVILEGES;
+  ```
 
 ---
 
 ## Verify Remote Access
 
-From client machine:
+- From client machine:
 
-```bash
-mysql -u myuser -p -h <MYSQL_SERVER_IP> myappdb
-```
+  ```bash
+  mysql -u remoteuser -p -h <MYSQL_SERVER_IP> myappdb
+  ```
+
+- Or for all database access:
+
+  ```bash
+  mysql -u remoteuser -p -h <MYSQL_SERVER_IP>
+  ```
 
 ---
 
 ## SELinux (Important in Production)
 
-Check SELinux:
+- Check SELinux:
 
-```bash
-getenforce
-```
+  ```bash
+  getenforce
+  ```
 
-If `Enforcing`, allow MySQL network connection:
+- If `Enforcing`, allow MySQL network connection:
 
-```bash
-setsebool -P mysql_connect_any 1
-```
+  ```bash
+  setsebool -P mysql_connect_any 1
+  ```
 
 ---
 
 ## Security Hardening Checklist
-
-### MUST DO (Production)
 
 * ✔ Do NOT use `bind-address = 0.0.0.0` in public internet environments
 * ✔ Restrict firewall to trusted subnet
