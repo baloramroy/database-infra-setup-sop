@@ -15,131 +15,139 @@ This Standard Operating Procedure (SOP) explains how to install, configure, secu
 
 ---
 
-## Check the Operating System Version
+## System Preparation
 
-```bash
-cat /etc/os-release
-```
+- Run below to check system OS:
+  
+  ```bash
+  cat /etc/os-release
+  ```
 
-or
+  or
 
-```bash
-hostname
-```
+  ```bash
+  hostnamectl
+  ```
 
----
+- Update the System
 
-## Update the System
+  ```bash
+  dnf update
+  ```
 
-```bash
-dnf update
-```
-
-(Optional reboot if required.)
+  > (Optional reboot if required.)
 
 ---
 
 ## Download the MySQL Community Repository Package
 
-For RHEL 9:
+- For RHEL 9:
 
-```bash
-wget https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
-```
+  ```bash
+  wget https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+  ```
 
-For RHEL 8:
+- For RHEL 8:
 
-```bash
-wget https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
-```
+  ```bash
+  wget https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
+  ```
 
-Verify the file:
+- Verify the file:
 
-```bash
-ls
-```
+  ```bash
+  ls
+  ```
 
 ---
 
 ## Install the MySQL Repository
 
-For RHEL 9:
+- For RHEL 9:
 
-```bash
-rpm -ivh mysql84-community-release-el9-1.noarch.rpm
-```
+  ```bash
+  rpm -ivh mysql84-community-release-el9-1.noarch.rpm
+  ```
 
-For RHEL 8:
+- For RHEL 8:
 
-```bash
-rpm -ivh mysql84-community-release-el8-1.noarch.rpm
-```
+  ```bash
+  rpm -ivh mysql84-community-release-el8-1.noarch.rpm
+  ```
 
-Verify:
+- Verify:
 
-```bash
-dnf repolist | grep mysql
-```
+  ```bash
+  dnf repolist | grep mysql
+  ```
 
 ---
 
 ## Install MySQL Server
 
-```bash
-dnf install mysql-community-server
-```
+- Run:
+ 
+  ```bash
+  dnf install mysql-community-server
+  ```
 
-Verify installation:
+- Verify installation:
 
-```bash
-mysql --version
-```
+  ```bash
+  mysql --version
+  ```
 
-Example:
+- Example:
 
-```
-mysql  Ver 8.4.x for Linux on x86_64
-```
-
----
-
-## Start the MySQL Service
-
-```bash
-systemctl start mysqld
-```
-
-Check status:
-
-```bash
-systemctl status mysqld
-```
-
-Expected:
-
-```
-Active: active (running)
-```
+  ```
+  mysql  Ver 8.4.x for Linux on x86_64
+  ```
 
 ---
 
-## Enable MySQL to Start Automatically
+## Start and Enabled MySQL Service
 
-```bash
-systemctl enable mysqld
-```
+### Start the MySQL Service
 
-Verify:
+- Run:
 
-```bash
-systemctl is-enabled mysqld
-```
+  ```bash
+  systemctl start mysqld
+  ```
 
-Expected:
+- Check status:
 
-```
-enabled
-```
+  ```bash
+  systemctl status mysqld
+  ```
+
+  Expected:
+
+  ```
+  Active: active (running)
+  ```
+
+#
+
+### Enable MySQL to Start Automatically
+
+- Run:
+
+  ```bash
+  systemctl enable mysqld
+  ```
+
+- Verify:
+
+  ```bash
+  systemctl is-enabled mysqld
+  ```
+
+  Expected:
+
+  ```
+  enabled
+  ```
 
 ---
 
@@ -147,17 +155,17 @@ enabled
 
 MySQL generates a temporary password during installation.
 
-Retrieve it:
+- Retrieve it:
 
-```bash
-grep 'temporary password' /var/log/mysqld.log
-```
+  ```bash
+  grep 'temporary password' /var/log/mysqld.log
+  ```
 
-Example:
+- Example:
 
-```
-temporary password is generated for root@localhost:  KlwRpd;pi4D7
-```
+  ```
+  temporary password is generated for root@localhost:  KlwRpd;pi4D7
+  ```
 
 Save this password securely.
 
@@ -165,6 +173,7 @@ Save this password securely.
 
 ## Run the MySQL Security Script
 
+>[!IMPORTANT]
 After completing **MySQL installation**, run the built-in **security script** to harden the server:
 
 Execute:
@@ -193,256 +202,270 @@ Reload privilege tables?          Y
 
 ---
 
-## Log In to MySQL
+## MySQL Service Management
 
-```bash
-mysql -u root -p
-```
+### Log In to MySQL
 
-Enter the password you configured.
+- Run:
 
-Expected prompt:
+  ```bash
+  mysql -u root -p
+  ```
 
-```sql
-mysql>
-```
+  Enter the password you configured.
 
----
+- Expected prompt:
 
-## Verify the Server Version
+  ```sql
+  mysql>
+  ```
 
-Inside MySQL:
+#
 
-```sql
-SELECT VERSION();
-```
+### Verify the Server Version
 
-Example output:
+- Inside MySQL:
 
-```
-+-----------+
-| VERSION() |
-+-----------+
-| 8.4.x     |
-+-----------+
-```
+  ```sql
+  SELECT VERSION();
+  ```
 
----
+- Example output:
 
-## View Existing Databases
+  ```
+  +-----------+
+  | VERSION() |
+  +-----------+
+  | 8.4.x     |
+  +-----------+
+  ```
 
-```sql
-SHOW DATABASES;
-```
+#
 
-Expected output:
+### View Existing Databases
 
-```
-information_schema
-mysql
-performance_schema
-sys
-```
+- Run:
+  
+  ```sql
+  SHOW DATABASES;
+  ```
 
----
+- Expected output:
 
-## Create a New Database
+  ```
+  information_schema
+  mysql
+  performance_schema
+  sys
+  ```
 
-```sql
-CREATE DATABASE myappdb;
-```
+#
 
-Verify:
+### Create a New Database
 
-```sql
-SHOW DATABASES;
-```
+- Run:
 
----
+  ```sql
+  CREATE DATABASE myappdb;
+  ```
 
-## Create a New User
+- Verify:
 
-```sql
-CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'Myuser@123';
-```
+  ```sql
+  SHOW DATABASES;
+  ```
 
----
+#
 
-## Grant Privileges
+### Create a New User
 
-Grant all privileges on the new database:
+- Run:
 
-```sql
-GRANT ALL PRIVILEGES ON myappdb.* TO 'myuser'@'localhost';
-```
+  ```sql
+  CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'Myuser@123';
+  ```
 
-Apply changes:
+#
 
-```sql
-FLUSH PRIVILEGES;
-```
+### Grant Privileges
 
-Exit:
+- Grant all privileges on the new database:
 
-```sql
-EXIT;
-```
+  ```sql
+  GRANT ALL PRIVILEGES ON myappdb.* TO 'myuser'@'localhost';
+  ```
+
+- Apply changes:
+
+  ```sql
+  FLUSH PRIVILEGES;
+  ```
+
+- Exit:
+
+  ```sql
+  EXIT;
+  ```
 
 ---
 
 ## Test the New User
 
-Log in with the new account:
+- Log in with the new account:
 
-```bash
-mysql -u myuser -p
-```
+  ```bash
+  mysql -u myuser -p
+  ```
 
-After entering the password, verify access:
+- After entering the password, verify access:
 
-```sql
-SHOW DATABASES;
-```
+  ```sql
+  SHOW DATABASES;
+  ```
 
-You should see `myappdb` among the available databases.
+  > You should see `myappdb` among the available databases.
 
 ---
 
 ## Check That MySQL Is Listening
 
-```bash
-ss -tulnp | grep 3306
-```
+- Run:
 
-Example output:
+  ```bash
+  ss -tulnp | grep 3306
+  ```
 
-```
-LISTEN 0 70 127.0.0.1:3306
-```
+- Example output:
+
+  ```
+  LISTEN 0 70 127.0.0.1:3306
+  ```
 
 ---
 
 ## Check Service Status
 
-```bash
-systemctl status mysqld
-```
+- Run:
 
-Or:
+  ```bash
+  systemctl status mysqld
+  ```
 
-```bash
-systemctl is-active mysqld
-```
+  Or:
 
-Expected:
+  ```bash
+  systemctl is-active mysqld
+  ```
 
-```
-active
-```
+- Expected:
+
+  ```
+  active
+  ```
 
 ---
 
 ## Open the Firewall (Optional, for Remote Access)
 
-If clients need to connect from other hosts:
+- If clients need to connect from other hosts:
 
-```bash
-firewall-cmd --permanent --add-service=mysql
-firewall-cmd --reload
-```
+  ```bash
+  firewall-cmd --permanent --add-service=mysql
+  firewall-cmd --reload
+  ```
 
-Verify:
+- Verify:
 
-```bash
-firewall-cmd --list-services
-```
+  ```bash
+  firewall-cmd --list-services
+  ```
 
 
 ---
 
 ## Common MySQL Service Commands
 
-Start:
+- Start:
 
-```bash
-systemctl start mysqld
-```
+  ```bash
+  systemctl start mysqld
+  ```
 
-Stop:
+- Stop:
 
-```bash
-systemctl stop mysqld
-```
+  ```bash
+  systemctl stop mysqld
+  ```
 
-Restart:
+- Restart:
 
-```bash
-systemctl restart mysqld
-```
+  ```bash
+  systemctl restart mysqld
+  ```
 
-Reload:
+- Reload:
 
-```bash
-systemctl reload mysqld
-```
+  ```bash
+  systemctl reload mysqld
+  ```
 
-Check status:
+- Check status:
 
-```bash
-systemctl status mysqld
-```
+  ```bash
+  systemctl status mysqld
+  ```
 
-Enable on boot:
+- Enable on boot:
 
-```bash
-systemctl enable mysqld
-```
+  ```bash
+  systemctl enable mysqld
+  ```
 
-Disable on boot:
+- Disable on boot:
 
-```bash
-systemctl disable mysqld
-```
+  ```bash
+  systemctl disable mysqld
+  ```
 
 ---
 
 ## Useful MySQL Commands
 
-Show databases:
+- Show databases:
 
-```sql
-SHOW DATABASES;
-```
+  ```sql
+  SHOW DATABASES;
+  ```
 
-Select a database:
+- Select a database:
 
-```sql
-USE myappdb;
-```
+  ```sql
+  USE myappdb;
+  ```
 
-List tables:
+- List tables:
 
-```sql
-SHOW TABLES;
-```
+  ```sql
+  SHOW TABLES;
+  ```
 
-Show users:
+- Show users:
 
-```sql
-SELECT user, host FROM mysql.user;
-```
+  ```sql
+  SELECT user, host FROM mysql.user;
+  ```
 
-Show grants for a user:
+- Show grants for a user:
 
-```sql
-SHOW GRANTS FOR 'myuser'@'localhost';
-```
+  ```sql
+  SHOW GRANTS FOR 'myuser'@'localhost';
+  ```
 
-Exit the MySQL shell:
+- Exit the MySQL shell:
 
-```sql
-EXIT;
-```
+  ```sql
+  EXIT;
+  ```
 
 ---
 
@@ -461,36 +484,36 @@ EXIT;
 
 # Troubleshooting
 
-**Check service status:**
+- **Check service status:**
 
-```bash
-systemctl status mysqld
-```
+  ```bash
+  systemctl status mysqld
+  ```
 
-**View recent logs:**
+- **View recent logs:**
 
-```bash
-journalctl -u mysqld -n 100
-```
+  ```bash
+  journalctl -u mysqld -n 100
+  ```
 
-**Follow logs in real time:**
+- **Follow logs in real time:**
 
-```bash
-journalctl -u mysqld -f
-```
+  ```bash
+  journalctl -u mysqld -f
+  ```
 
-**Verify the listening port:**
+- **Verify the listening port:**
 
-```bash
-ss -ltnp | grep 3306
-```
+  ```bash
+  ss -ltnp | grep 3306
+  ```
 
-**Test a local connection:**
+- **Test a local connection:**
 
-```bash
-mysql -u root -p
-```
+  ```bash
+  mysql -u root -p
+  ```
 
-This procedure provides a production-oriented baseline for installing and securing MySQL on RHEL, with optional steps for enabling remote connectivity when required.
+> This procedure provides a production-oriented baseline for installing and securing MySQL on RHEL.
 
 ---
