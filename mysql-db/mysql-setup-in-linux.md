@@ -1,4 +1,4 @@
-# SOP: Install and Configure MySQL Server on Red Hat Linux (RHEL 8/9)
+# SOP: Install and Configure MySQL Server on Red Hat Linux
 
 This Standard Operating Procedure (SOP) explains how to install, configure, secure, and verify a MySQL Server installation on Red Hat Enterprise Linux.
 
