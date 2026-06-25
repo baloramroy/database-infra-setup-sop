@@ -119,13 +119,13 @@ TZ=Asia/Dhaka
 
 ### Create the Compose File
 
-◾ **Create `compose.yaml` file in mysql-docker directory:**
+◾ **Create `compose.yml` file in mysql-docker directory:**
 
 ```yaml
 # compose.yml
 services:
   mysql:
-    image: mysql:8.0                    # Use official MySQL 8.0 image
+    image: mysql:8.4                    # Use official MySQL 8.0 image
     container_name: mysql_db
     restart: unless-stopped             # Auto-restart on failure
     ports:
@@ -137,14 +137,17 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: ${TZ}
     volumes:
-      - mysql_data:/var/lib/mysql       # Bind volume for persistence
+      - ./mysql_data:/var/lib/mysql       # Bind volume for persistence
       - ./config/my.cnf:/etc/mysql/conf.d/my.cnf:ro   # Custom config
       - ./initdb:/docker-entrypoint-initdb.d:ro          # Init scripts
     networks:
       - db_network
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost',
-             '-u', 'root', '-p${MYSQL_ROOT_PASSWORD}']
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -uroot -p$MYSQL_ROOT_PASSWORD"
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -226,7 +229,33 @@ FLUSH PRIVILEGES;
 
 ## Deploy MySQL Container
 
-### Start the Container
+### Create Docker Network First
+
+- Run:
+  
+  ```bash
+  docker network create db_network
+  ```
+
+#
+
+### Docker Compose Validation
+
+- Before deployment
+  
+  ```bash
+  docker compose config
+  ```
+
+- This validates
+
+  - YAML
+  - variables
+  - syntax
+
+#
+
+### Start the Container Now
 
 - Navigate to the project directory:
 
@@ -249,10 +278,14 @@ FLUSH PRIVILEGES;
   Expected output:
   ```
   NAME        IMAGE       COMMAND                  STATUS          PORTS
-  mysql_db    mysql:8.0   'docker-entrypoint.s...'  Up (healthy)    0.0.0.0:3306->3306/tcp
+  mysql_db    mysql:8.4   'docker-entrypoint.s...'  Up (healthy)    0.0.0.0:3306->3306/tcp
   ```
 
-- Check container logs:
+#
+
+### Inspect Logs
+
+- Check container logs for successfull startup:
 
   ```bash
   docker compose logs -f mysql
@@ -263,15 +296,6 @@ FLUSH PRIVILEGES;
 #
 
 ### Verify Health Check
-
-- Check health status
-
-  ```bash
-  docker inspect mysql_db --format='{{.State.Health.Status}}'
-  ```
-
-  >Expected: `healthy`
-
 
 - Verify the Container Is Running
 
@@ -284,6 +308,35 @@ FLUSH PRIVILEGES;
   ```
   CONTAINER ID   IMAGE       STATUS
   xxxxxx         mysql:8.4   Up
+  ```
+
+- Check health status
+
+  ```bash
+  docker inspect mysql_db --format='{{.State.Health.Status}}'
+  ```
+
+  >Expected: `healthy`
+
+
+- Volume Inspection
+  
+  ```bash
+  # List Volume 
+  docker volume ls
+
+  # Inspect Volume
+  docker volume inspect mysql_data
+  ```
+
+- Network Inspection
+
+  ```bash
+  # List network 
+  docker network ls
+
+  # Inspect network
+  docker network inspect db_network
   ```
 
 ---
