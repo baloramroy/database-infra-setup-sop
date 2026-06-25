@@ -84,13 +84,13 @@ Run the following commands to confirm Docker and Docker Compose are installed:
 ### Create the .env File
 
 
-⬛ **Create the `.env` file:**
+◾ **Create the `.env` file in mysql-docker directory:**
 
 ```bash
 vim .env
 ```
 
-⬛ **Example:**
+◾ **Insert below lines:**
 
 ```env
 # .env
@@ -119,7 +119,7 @@ TZ=Asia/Dhaka
 
 ### Create the Compose File
 
-⬛ Create `compose.yaml`:
+◾ **Create `compose.yaml` file in mysql-docker directory:**
 
 ```yaml
 # compose.yml
@@ -164,7 +164,7 @@ networks:
 
 ### Create Custom MySQL Configuration (Optional)
 
-⚫ **Create `config/my.cnf` for performance tuning:**
+◾ **Create `config/my.cnf` for performance tuning:**
 
 ```ini
 # config/my.cnf
@@ -194,13 +194,13 @@ default-character-set   = utf8mb4
 
 ### Create Initialization SQL Script (Optional)
 
-⚫ **Create a SQL file:**
+◾ **Create a SQL file:**
 
 ```bash
 vim initdb/01_init.sql
 ```
 
-⚫ **Create `init/01_init.sql` to run on first startup:**
+◾ **Create `init/01_init.sql` to run on first startup:**
 
 ```sql
 -- init/01_init.sql
@@ -348,7 +348,7 @@ Open a **MySQL shell** inside the **container**:
 
 ### Backup & Restore
 
-⚫ **Backup Database**
+◾ **Backup Database**
 
 ```bash
 # Dump a single database
@@ -360,7 +360,7 @@ docker exec mysql_db mysqldump -u root -p${MYSQL_ROOT_PASSWORD} --all-databases 
   > ./backups/all_databases_$(date +%Y%m%d_%H%M%S).sql
 ```
 
-⚫ **Restore Database**
+◾ **Restore Database**
 
 ```bash
 # Restore from SQL dump
@@ -368,16 +368,17 @@ docker exec -i mysql_db mysql -u root -p${MYSQL_ROOT_PASSWORD} myappdb \
   < ./backups/myappdb_20240101_120000.sql
 ```
 
+#
 
 ### Upgrade MySQL Version
 
-⚫ **Update the image tag in `docker-compose.yml`:**
+◾ **Update the image tag in `docker-compose.yml`:**
 
 ```yaml
 image: mysql:8.4   # Update version tag
 ```
 
-⚫ **Pull the new image and recreate the container:**
+◾ **Pull the new image and recreate the container:**
 
 ```bash
 docker compose pull
