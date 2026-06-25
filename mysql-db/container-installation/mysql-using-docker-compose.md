@@ -83,9 +83,6 @@ Run the following commands to confirm Docker and Docker Compose are installed:
 
 ### Create the .env File
 
->[!TIP]
-> **Note:** Store all sensitive credentials in a `.env` file. Never commit this file to version control. \
-> **Warning:** Add `.env` to your `.gitignore` file to prevent credentials from being exposed in version control.
 
 ⬛ **Create the `.env` file:**
 
@@ -113,13 +110,16 @@ MYSQL_PORT=3306
 
 TZ=Asia/Dhaka
 ```
+>[!TIP]
+> **Note:** Store all sensitive credentials in a `.env` file. Never commit this file to version control. \
+> **Warning:** Add `.env` to your `.gitignore` file to prevent credentials from being exposed in version control.
+
 
 #
 
+### Create the Compose File
 
-### Create the compose.yml File
-
-⚫ Create `compose.yaml`:
+⬛ Create `compose.yaml`:
 
 ```yaml
 # compose.yml
