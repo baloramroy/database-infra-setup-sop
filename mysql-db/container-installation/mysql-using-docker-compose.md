@@ -2,11 +2,11 @@
 # Running MySQL on Docker Using Docker Compose
 
 
-| **Document Title** | Running MySQL on Docker Using Docker Compose     |
-|-------------------|---------------------------------------------------|
-| **Version**       | 1.0                                               |
-| **Effective Date**| June 24, 2026                                     |
-| **Scope**         | Development, Staging, and Production environments |
+|**Document Title** |Running MySQL on Docker Using Docker Compose                 |
+|-------------------|-------------------------------------------------------------|
+| **Version**       | 1.0                                                         |
+| **Effective Date**| June 24, 2026                                               |
+| **Scope**         | Development, Staging, and Production environments           |
 | **Applies To**    | DevOps Engineers, Backend Developers, System Administrators |
 
 ---
