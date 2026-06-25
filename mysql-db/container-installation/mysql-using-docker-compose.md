@@ -87,13 +87,13 @@ Run the following commands to confirm Docker and Docker Compose are installed:
 > **Note:** Store all sensitive credentials in a `.env` file. Never commit this file to version control. \
 > **Warning:** Add `.env` to your `.gitignore` file to prevent credentials from being exposed in version control.
 
-⚫ **Create the `.env` file:**
+⬛ **Create the `.env` file:**
 
 ```bash
 vim .env
 ```
 
-⚫ **Example:**
+⬛ **Example:**
 
 ```env
 # .env
