@@ -79,6 +79,41 @@ Run the following commands to confirm Docker and Docker Compose are installed:
 
 ---
 
+## Set Necessary Permission
+
+- **Verify user and ID information by running temporary container:**
+
+  ```bash
+  docker run --rm -it --entrypoint /bin/sh mysql:8.4
+  ```
+- **Then run `whoami` and `id` command inside container**
+  ```
+  /bash-5.1 $ whoami
+  Output: root
+  
+  /bash-5.1 $ id root
+  uid=0(root) gid=0(root) groups=0(root)
+  ```
+
+### Now change the directory permission
+
+- The MySQL container starts as the **root** user to perform initialization tasks such as creating the **data** directory, adjusting file **ownership**, and executing initialization **scripts**. 
+- After initialization, the **MySQL server** runs as the **mysql** user inside the **container**.
+- Create the required directories and assign temporary ownership to root:
+
+  ```bash
+  chown -R 0:0 config initdb mysql_data
+  ```
+
+>[!NOTE]
+◼️ The **ownership** of the **mysql_data** directory may automatically change after the **container starts.** \
+◼️ During initialization, the MySQL entrypoint script changes the **ownership** of the data directory to the internal **mysql** user (currently **UID 999/GID 999** in the official **mysql:8.4** image). \
+◼️ On the host, these **numeric IDs** may appear as different **usernames** (for example, **systemd-coredump** or another local account) because Linux displays the **host's local username** associated with the same **UID/GID**. \
+◼️ This behavior is **normal** and does not indicate that the **ownership** has been **assigned** to the **host user**.
+
+
+---
+
 ## Create Configuration Files
 
 ### Create the .env File
@@ -161,36 +196,6 @@ networks:
   db_network:
     driver: bridge
     external: true
-```
-
-#
-
-### Create Custom MySQL Configuration (Optional)
-
-◾ **Create `config/my.cnf` for performance tuning:**
-
-```ini
-# config/my.cnf
-[mysqld]
-# Character set
-character-set-server    = utf8mb4
-collation-server        = utf8mb4_unicode_ci
-
-# Connection settings
-max_connections         = 200
-connect_timeout         = 10
-
-# InnoDB settings
-innodb_buffer_pool_size = 256M
-innodb_log_file_size    = 64M
-
-# Logging
-slow_query_log          = 1
-slow_query_log_file     = /var/log/mysql/slow.log
-long_query_time         = 2
-
-[client]
-default-character-set   = utf8mb4
 ```
 
 #
@@ -317,17 +322,6 @@ FLUSH PRIVILEGES;
   ```
 
   >Expected: `healthy`
-
-
-- Volume Inspection
-  
-  ```bash
-  # List Volume 
-  docker volume ls
-
-  # Inspect Volume
-  docker volume inspect mysql_data
-  ```
 
 - Network Inspection
 
