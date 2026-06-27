@@ -188,10 +188,6 @@ services:
       retries: 5
       start_period: 30s
 
-volumes:
-  mysql_data:
-    external: true
-
 networks:
   db_network:
     driver: bridge
